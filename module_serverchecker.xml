@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_serverchecker" default="compile.module.serverchecker">
+  <dirname property="module.serverchecker.basedir" file="${ant.file.module_serverchecker}"/>
+  
+  <property name="module.jdk.home.serverchecker" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.serverchecker" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.serverchecker" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.serverchecker" value="-encoding UTF-8 -source 11 -target 11 ${compiler.args}"/>
+  
+  <property name="serverchecker.output.dir" value="${module.serverchecker.basedir}/out/production/serverChecker"/>
+  <property name="serverchecker.testoutput.dir" value="${module.serverchecker.basedir}/out/test/serverChecker"/>
+  
+  <path id="serverchecker.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="serverchecker.module.production.classpath">
+    <path refid="${module.jdk.classpath.serverchecker}"/>
+  </path>
+  
+  <path id="serverchecker.runtime.production.module.classpath">
+    <pathelement location="${serverchecker.output.dir}"/>
+  </path>
+  
+  <path id="serverchecker.module.classpath">
+    <path refid="${module.jdk.classpath.serverchecker}"/>
+    <pathelement location="${serverchecker.output.dir}"/>
+  </path>
+  
+  <path id="serverchecker.runtime.module.classpath">
+    <pathelement location="${serverchecker.testoutput.dir}"/>
+    <pathelement location="${serverchecker.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.serverchecker">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.serverchecker">
+    <patternset refid="excluded.from.module.serverchecker"/>
+  </patternset>
+  
+  <path id="serverchecker.module.sourcepath">
+    <dirset dir="${module.serverchecker.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.serverchecker" depends="compile.module.serverchecker.production,compile.module.serverchecker.tests" description="Compile module serverChecker"/>
+  
+  <target name="compile.module.serverchecker.production" depends="register.custom.compilers" description="Compile module serverChecker; production classes">
+    <mkdir dir="${serverchecker.output.dir}"/>
+    <javac2 destdir="${serverchecker.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.serverchecker}/javac">
+      <compilerarg line="${compiler.args.serverchecker}"/>
+      <bootclasspath refid="serverchecker.module.bootclasspath"/>
+      <classpath refid="serverchecker.module.production.classpath"/>
+      <src refid="serverchecker.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.serverchecker"/>
+    </javac2>
+    
+    <copy todir="${serverchecker.output.dir}">
+      <fileset dir="${module.serverchecker.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.serverchecker.tests" depends="register.custom.compilers,compile.module.serverchecker.production" description="compile module serverChecker; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.serverchecker" description="cleanup module">
+    <delete dir="${serverchecker.output.dir}"/>
+    <delete dir="${serverchecker.testoutput.dir}"/>
+  </target>
+</project>
